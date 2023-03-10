@@ -20,9 +20,18 @@ html{
   display: flex;
   flex-direction: row;
   gap:10px;
+  justify-content: center;
 }
 
-.todo-list{
+.tasks {
+  display: flex;
+  gap: 40px;
+  background-color: grey;
+}
+
+
+
+.pending-todo-list{
   padding:0;
   margin: 0;
   display: flex;
@@ -31,11 +40,11 @@ html{
   gap:10px;
 }
 
-.todo-list li{
+.pending-todo-list li{
   display: flex;
   justify-content: space-between;
 }
-.todo-list li span{
+.pending-todo-list li span{
   flex-grow: 1;
   text-align: center;
 }
