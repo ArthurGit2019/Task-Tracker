@@ -22,11 +22,7 @@
         console.log(data);
     }); */
 
-const myFetch = () => {
-
-}
-
-const APIs = (() => {
+const myFetchAPIs = (() => {
     const createTodo = (newTodo) => {
         return fetch("http://localhost:3000/todos", {
             method: "POST",
@@ -35,9 +31,9 @@ const APIs = (() => {
         }).then((res) => res.json());
     };
 
-    const updateTodo = (newTodo) => {
-        return fetch("http://localhost:3000/todos", {
-            method: "POST",
+    const updateTodo = (id, newTodo) => {
+        return fetch("http://localhost:3000/todos/" + id, {
+            method: "PUT",
             body: JSON.stringify(newTodo),
             headers: { "Content-Type": "application/json" },
         }).then((res) => res.json());
@@ -85,7 +81,7 @@ const Model = (() => {
             this.#onChange = callback;
         }
     }
-    const { getTodos, createTodo, deleteTodo, updateTodo } = APIs;
+    const { getTodos, createTodo, deleteTodo, updateTodo } = myFetchAPIs;
     return {
         State,
         getTodos,
@@ -107,6 +103,8 @@ const Model = (() => {
     ]
 
 */
+
+// let eachTask = "";
 const View = (() => {
     const pendinglistEl = document.querySelector(".pending-todo-list");
     const completedlistEl = document.querySelector(".completed-todo-list");
@@ -118,8 +116,16 @@ const View = (() => {
         let todosTemplate = "";
         const pendingTasks = todos.filter(todo => todo.pending);
         const completedTasks = todos.filter(todo => todo.pending === false);
+        
         pendingTasks.forEach((todo) => {
-            const liTemplate = `<li><span id="span${todo.id}">${todo.content}</span><button class="edit-btn" id="${todo.id}">Edit</button><button class="delete-btn" id="${todo.id}">delete</button><button class="move-btn" id="${todo.id}">Move</button></li>`;
+            // eachTask = `<span id="span${todo.id}">${todo.content}</span>`;
+            const liTemplate = `<li><span id="span${todo.id}">${todo.content}</span><button class="edit-btn" id="${todo.id}"><svg focusable="false" 
+            aria-hidden="true" viewBox="0 0 24 24"  aria-label="fontSize small"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 
+            7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg></button><button class=
+            "delete-btn" id="${todo.id}"><svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" aria-label="fontSize small"><path d=
+            "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button><button class="move-btn" 
+            id="${todo.id}"><svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="ArrowForwardIcon" aria-label="fontSize small">
+            <path d="m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"></path></svg></button></li>`;
             todosTemplate += liTemplate;
         });
         if (pendingTasks.length === 0) {
@@ -128,7 +134,14 @@ const View = (() => {
         pendinglistEl.innerHTML = todosTemplate;
         todosTemplate = "";
         completedTasks.forEach((todo) => {
-            const liTemplate = `<li><span id="span${todo.id}">${todo.content}</span><button class="edit-btn" id="${todo.id}">Edit</button><button class="delete-btn" id="${todo.id}">delete</button><button class="move-btn" id="${todo.id}">Move</button></li>`;
+            // eachTask = `<span id="span${todo.id}">${todo.content}</span>`;
+            const liTemplate = `<li><button class="move-btn" id="${todo.id}"><svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" aria-label=
+            "fontSize small"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg></button>
+            <span id="span${todo.id}">${todo.content}</span><button class="edit-btn" id="${todo.id}"><svg focusable="false" 
+            aria-hidden="true" viewBox="0 0 24 24"  aria-label="fontSize small"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 
+            7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg></button><button class=
+            "delete-btn" id="${todo.id}"><svg focusable="false" aria-hidden="true" viewBox="0 0 24 24" aria-label="fontSize small"><path d=
+            "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg></button></li>`;
             todosTemplate += liTemplate;
         });
         if (completedTasks.length === 0) {
@@ -168,24 +181,57 @@ const Controller = ((view, model) => {
         });
     };
 
+    const toggleEdit = (event, displayInput) => {
+         // displayInput = !displayInput;
+        const id = event.target.id;
+        if (displayInput) {
+            let txt = document.getElementById("span" + id).innerText;
+            console.log(txt);
+            document.getElementById("span" + id).innerHTML = `<input id="input${id}" class="editTask" value="${txt}" />`;
+        }
+
+        if (!displayInput) {
+            const newContent = document.getElementById("input" + id).value;
+            const tasktoUpdate = state.todos.find(todo => todo.id === +id);
+            const newTodo = {content: newContent, pending: tasktoUpdate.pending};
+
+            document.getElementById("input" + id).innerHTML = `<span id="span${id}">${newContent}</span>`;
+            model.updateTodo(id, newTodo).then((data) => {
+                    
+                // state.todos = todos;
+                console.log(data);
+                // view.clearInput();
+            });
+            init();
+        }
+        // model.deleteTodo(+id).then((data) => {
+        //     state.todos = state.todos.filter((todo) => todo.id !== +id);
+        // });
+        
+    }
+
     const handleChange = () => {
+        var displayPendingInput = false;
         view.pendinglistEl.addEventListener("click", (event) => {
             if (event.target.className === "edit-btn") {
-                const id = event.target.id;
-                console.log(document.getElementById("span" + id));
-                document.getElementById("span" + id).contentEditable = true;
-                const newContent = document.getElementById("span" + id).innerHTML;
-                const tasktoUpdate = state.todos.find(todo => todo.id === +id);
-                const newTodo = {content: newContent, pending: tasktoUpdate.pending};
-                model.deleteTodo(+id).then((data) => {
-                    state.todos = state.todos.filter((todo) => todo.id !== +id);
-                });
-                model.updateTodo( newTodo ).then((data) => {
+                displayPendingInput = !displayPendingInput;
+                toggleEdit(event, displayPendingInput);
+                // const id = event.target.id;
+                // let txt = document.getElementById("span" + id).innerText;
+                // document.getElementById("span" + id).innerHTML = `<input id=${id} value=${txt} />`;
+                // const newContent = task.innerHTML;
+                // const tasktoUpdate = state.todos.find(todo => todo.id === +id);
+                // const newTodo = {content: newContent, pending: tasktoUpdate.pending};
+                // // model.deleteTodo(+id).then((data) => {
+                // //     state.todos = state.todos.filter((todo) => todo.id !== +id);
+                // // });
+                // model.updateTodo(id, newTodo).then((data) => {
                     
-                    state.todos = [data, ...state.todos];
-                    console.log(data);
-                    // view.clearInput();
-                });
+                //     // state.todos = todos;
+                //     console.log(data);
+                //     // view.clearInput();
+                // });
+                // init();
                 // state.todos.find(todo => todo.id === +id).content = newContent;
                 // model.createTodo({ content: newContent }).then((data) => {
                 // state.todos = [data, ...state.todos];
@@ -193,22 +239,27 @@ const Controller = ((view, model) => {
                 // });
             }
         });
+        var displayCompleteInput = false;
         view.completedlistEl.addEventListener("click", (event) => {
             if (event.target.className === "edit-btn") {
-                const id = event.target.id;
-                document.getElementById("span" + id).contentEditable = true;
-                const newContent = document.getElementById("span" + id).innerHTML;
-                const tasktoUpdate = state.todos.find(todo => todo.id === +id);
-                const newTodo = {content: newContent, pending: tasktoUpdate.pending};
-                model.deleteTodo(+id).then((data) => {
-                    state.todos = state.todos.filter((todo) => todo.id !== +id);
-                });
-                model.updateTodo( newTodo ).then((data) => {
+                displayCompleteInput = !displayCompleteInput;
+                toggleEdit(event, displayCompleteInput);
+                // const id = event.target.id;
+                // const task = document.getElementById("span" + id);
+                // task.contentEditable = true;
+                // const newContent = task.innerHTML;
+                // const tasktoUpdate = state.todos.find(todo => todo.id === +id);
+                // const newTodo = {content: newContent, pending: tasktoUpdate.pending};
+                // // model.deleteTodo(+id).then((data) => {
+                // //     state.todos = state.todos.filter((todo) => todo.id !== +id);
+                // // });
+                // model.updateTodo( id, newTodo ).then((data) => {
                     
-                    state.todos = [data, ...state.todos];
-                    console.log(data);
-                    // view.clearInput();
-                });
+                //     // state.todos = todos;
+                //     console.log(data);
+                //     // view.clearInput();
+                // });
+                // init();
                 // state.todos.find(todo => todo.id === +id).content = newContent;
                 // model.createTodo({ content: newContent }).then((data) => {
                 // state.todos = [data, ...state.todos];
@@ -254,14 +305,15 @@ const Controller = ((view, model) => {
                 console.log("id", typeof id);
                 const tasktoUpdate = state.todos.find(todo => todo.id === +id);
                 const newTodo = {content: tasktoUpdate.content, pending: !tasktoUpdate.pending};
-                model.deleteTodo(+id).then((data) => {
-                    state.todos = state.todos.filter((todo) => todo.id !== +id);
-                });
-                model.updateTodo( newTodo ).then((data) => {
-                    state.todos = [data, ...state.todos];
-                    
+                // model.deleteTodo(+id).then((data) => {
+                //     state.todos = state.todos.filter((todo) => todo.id !== +id);
+                // });
+                model.updateTodo( id, newTodo ).then((data) => {
+                    // state.todos = todos;
+                    console.log(data);
                     // view.clearInput();
                 });
+                init();
                 
             }
         });
@@ -272,14 +324,15 @@ const Controller = ((view, model) => {
                 console.log("id", typeof id);
                 const tasktoUpdate = state.todos.find(todo => todo.id === +id);
                 const newTodo = {content: tasktoUpdate.content, pending: !tasktoUpdate.pending};
-                model.deleteTodo(+id).then((data) => {
-                    state.todos = state.todos.filter((todo) => todo.id !== +id);
-                });
-                model.updateTodo( newTodo ).then((data) => {
-                    state.todos = [data, ...state.todos];
+                // model.deleteTodo(+id).then((data) => {
+                //     state.todos = state.todos.filter((todo) => todo.id !== +id);
+                // });
+                model.updateTodo( id, newTodo ).then((data) => {
+                    // state.todos = todos;
                     console.log(data);
                     // view.clearInput();
                 });
+                init();
             }
         });
     }

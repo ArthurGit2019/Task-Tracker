@@ -1,52 +1,126 @@
-.app{
+.app {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  /* border: 1px solid black; */
   border-radius: 5px;
   width: fit-content;
-  padding:10px;
+  padding: 10px;
   text-align: center;
-  gap:10px;
+  gap: 10px;
   align-items: stretch;
 
 }
 
-html{
+html {
   display: flex;
   justify-content: center;
 }
 
-.form{
+.input {
+  height: 25px;
+  border: none;
+  border-radius: 3px;
+}
+
+.input {
+  border: solid 1px lightgrey;
+}
+
+.submit-btn {
+  height: 25px;
+  color: white;
+  background-color: #008cba;
+  border-radius: 2px;
+  border: none;
+}
+
+.form {
   display: flex;
   flex-direction: row;
-  gap:10px;
+  gap: 10px;
   justify-content: center;
+  padding-bottom: 10px;
 }
 
 .tasks {
   display: flex;
-  gap: 40px;
-  background-color: grey;
+  gap: 10px;
+  
+  /* background-color: #f0f0f0; */
 }
 
+h2 {
+  text-align: left;
+}
 
+.pending-tasks, .completed-tasks {
+  width: 620px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  /* background-color: #e6e2d3; */
+}
 
-.pending-todo-list{
-  padding:0;
+.pending-todo-list, .completed-todo-list {
+  padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
   list-style-type: none;
-  gap:10px;
+  gap: 10px;
+  /* background-color: #e6e2d3; */
 }
 
-.pending-todo-list li{
+.pending-todo-list li, .completed-todo-list li {
   display: flex;
   justify-content: space-between;
+  height: 40px;
+  background-color: #e6e2d3;
+  align-items: center;
+  border-radius: 5px;
+  /* gap: 10px; */
 }
-.pending-todo-list li span{
+
+.pending-todo-list li span, .completed-todo-list li span {
   flex-grow: 1;
   text-align: center;
+  background-color: #e6e2d3;
+  
+}
+
+svg {
+  height: 20px;
+  width: 20px;
+  pointer-events: none;
+}
+
+button {
+  border: none;
+}
+
+.edit-btn {
+  background-color: #008cba;
+  margin-right: 5px;
+}
+
+.delete-btn {
+  background-color: #c94c4c;
+  margin-right: 5px;
+}
+
+.move-btn {
+  margin-left: 5px;
+  margin-right: 5px;
+  background-color: #4caf50;
+}
+
+.edit-btn svg, .delete-btn svg, .move-btn svg {
+  fill: white;
+}
+
+.editTask {
+  width: 500px;
+  height: 17px;
 }
 
 
